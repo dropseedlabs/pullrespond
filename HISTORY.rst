@@ -5,7 +5,7 @@ History
 0.1.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+* Fix missing submodules.
 
 
 0.1.0 (2017-07-04)
