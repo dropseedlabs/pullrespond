@@ -23,7 +23,7 @@ PROMPT_COMMANDS = [
     'overview',
     'diff',
     'open',
-    # 'review',
+    'review',
     # 'reviews',
 ]
 
@@ -58,6 +58,8 @@ class PullRequest(object):
                 self.print_diff()
             elif command_input == 'open':
                 self.open_in_browser()
+            elif command_input == 'review':
+                self.review_prompt()
 
     def comment_prompt(self):
         # could complete usernames with @...
@@ -81,6 +83,51 @@ class PullRequest(object):
                         }
                       }""" % (pull_request_id, comment)
         graphql(mutation)
+
+    def review_prompt(self):
+        # could complete usernames with @...
+        review_commands = ('approve', 'comment', 'request_changes')
+        review = prompt(
+            u'What kind of review? ',
+            completer=WordCompleter(review_commands),
+            validator=ChoiceValidator(review_commands),
+        )
+        review = review.upper()
+
+        click.secho('Enter comment (press ESC then ENTER to finish)')
+        comment = prompt(
+            u'--> ',
+            mouse_support=True,
+            multiline=True,
+        )
+        query = """query {
+                    repository(owner: "%s", name: "%s") {
+                      pullRequest(number: %s) {
+                        id
+                        commits(last: 1) {
+                          edges {
+                            node {
+                              commit {
+                                oid
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                }""" % (self.repo.owner.name, self.repo.name, self.number)
+
+        pull_data = graphql(query)['repository']['pullRequest']
+        pull_id = pull_data['id']
+        sha = pull_data['commits']['edges'][0]['node']['commit']['oid']
+
+        mutation = """mutation {
+                        addPullRequestReview(input:{pullRequestId: "%s", commitOID: "%s", event: %s, body: "%s"}) {
+                          clientMutationId
+                        }
+                      }""" % (pull_id, sha, review, comment)
+        graphql(mutation)
+        click.secho('Review added - {}.'.format(review), fg='green')
 
     def merge_prompt(self):
         query = """query {

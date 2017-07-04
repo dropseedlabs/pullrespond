@@ -40,7 +40,7 @@ def graphql(query):
     data = response.json()['data']
 
     if data == None:
-        raise Exception('No data in response.')
+        raise Exception('No data in response.\n{}'.format(response.text))
 
     return data
 
