@@ -30,7 +30,7 @@ test_requirements = [
 
 setup(
     name='reduce',
-    version='0.1.1.dev0',
+    version='0.1.1',
     description="A simple CLI for responding to and merging pull requests.",
     long_description=readme + '\n\n' + history,
     author="Dropseed, LLC",
