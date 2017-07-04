@@ -10,6 +10,7 @@ from pygments.formatters import TerminalFormatter
 
 from .api import graphql, rest
 from ..prompt_validators import ChoiceValidator
+from ..hooks import run_hook
 
 
 PROMPT_COMMANDS = [
@@ -111,6 +112,8 @@ class PullRequest(object):
         rest(requests.put, endpoint, data)
 
         click.secho('PR successfully merged.', fg='green')
+
+        run_hook('post_merge', self.repo.name, self.number, self.repo.full_name)
 
         branch_name = pull_data['headRefName']
         if click.confirm('Delete the {} branch?'.format(branch_name)):

@@ -26,13 +26,26 @@ Installation
 .. code-block:: bash
 
     pip install pullrespond
-    
+
 Usage
 -----
 
 .. code-block:: bash
 
     pullrespond <organization slug>
+
+Hooks
+-----
+
+There are several places where a user can run a custom script as a part of their
+process (i.e. deploying after a merge). Put an executable script matching the
+name of the hook at ``~/.pullrespond/hooks/<hook_name>``. Each hook will also
+receive a set of arguments, which you can use in your script.
+
+* ``post_merge`` - run right after a successful merge
+  * repo name
+  * PR number
+  * repo full name (owner/repo)
 
 
 Features
