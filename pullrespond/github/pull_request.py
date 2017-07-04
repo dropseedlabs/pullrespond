@@ -184,6 +184,13 @@ class PullRequest(object):
             )
         )
 
+        body = overview.get('bodyText', '_No body._')
+        body_lines = body.splitlines()
+        short_body = body_lines[0] + '...' if len(body_lines) > 0 and len(body_lines) > 1 else body
+        click.secho('')
+        click.secho(short_body)
+        click.secho('')
+
         click.secho('Comments: {}'.format(overview['comments']['totalCount']))
         click.secho('Reviews: {}'.format(overview['reviews']['totalCount']))
         click.secho('Review requests: {}'.format(overview['reviewRequests']['totalCount']))
@@ -211,8 +218,7 @@ class PullRequest(object):
                     description=context['description'],
                 ), fg=color_for_state(context['state']))
 
-        # click.secho('\nBody:')
-        # click.secho(overview['bodyText'])
+        click.secho('')
 
     def print_diff(self):
         endpoint = '/repos/{}/pulls/{}'.format(self.repo.full_name, self.number)
