@@ -1,6 +1,6 @@
-============
-Pull Respond
-============
+===========
+pullrespond
+===========
 
 
 .. image:: https://travis-ci.org/dropseedlabs/pullrespond.svg?branch=master
@@ -17,7 +17,7 @@ Pull Respond
 
 
 
-A simply CLI for responding to and merging pull requests.
+A CLI for responding to and merging pull requests.
 
 
 Installation
