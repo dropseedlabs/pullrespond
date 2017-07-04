@@ -31,7 +31,7 @@ test_requirements = [
 setup(
     name='pullrespond',
     version='0.1.0',
-    description="A simply CLI for responding to and merging pull requests.",
+    description="A simple CLI for responding to and merging pull requests.",
     long_description=readme + '\n\n' + history,
     author="Dropseed, LLC",
     author_email='python@dropseed.io',
