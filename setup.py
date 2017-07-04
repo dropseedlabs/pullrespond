@@ -29,24 +29,24 @@ test_requirements = [
 ]
 
 setup(
-    name='pullrespond',
+    name='reduce',
     version='0.1.0',
     description="A simple CLI for responding to and merging pull requests.",
     long_description=readme + '\n\n' + history,
     author="Dropseed, LLC",
     author_email='python@dropseed.io',
-    url='https://github.com/dropseedlabs/pullrespond',
-    packages=find_packages(include=['pullrespond']),
+    url='https://github.com/dropseedlabs/reduce',
+    packages=find_packages(include=['reduce']),
     entry_points={
         'console_scripts': [
-            'pullrespond=pullrespond.cli:main'
+            'reduce=reduce.cli:main'
         ]
     },
     include_package_data=True,
     install_requires=requirements,
     license="MIT license",
     zip_safe=False,
-    keywords='pullrespond',
+    keywords='reduce',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',

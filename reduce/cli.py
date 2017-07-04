@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Console script for pullrespond."""
+"""Console script for reduce."""
 
 import click
 

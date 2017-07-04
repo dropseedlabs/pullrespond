@@ -4,7 +4,7 @@ import requests
 
 
 def get_github_token():
-    token_file_path = os.path.expanduser('~/.pullrespond/github_token')
+    token_file_path = os.path.expanduser('~/.reduce/github_token')
     if not os.path.exists(token_file_path):
         click.secho('We didn\'t find a GitHub API token in {}.'.format(token_file_path))
         click.secho('Please go to https://github.com/settings/tokens and generate a new token with these permissions:')
@@ -12,7 +12,7 @@ def get_github_token():
         click.secho('')
         token = click.prompt('Enter the token and we\'ll save it to {}'.format(token_file_path))
 
-        os.makedirs(os.path.dirname(token_file_path))  # probably don't have ~/.pullrespond yet
+        os.makedirs(os.path.dirname(token_file_path))  # probably don't have ~/.reduce yet
         with open(token_file_path, 'w+') as f:
             f.write(token)
 

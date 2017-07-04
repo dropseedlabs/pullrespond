@@ -5,7 +5,7 @@ import click
 
 
 def run_hook(name, *args):
-    hook_path = path.expanduser('~/.pullrespond/hooks/' + name)
+    hook_path = path.expanduser('~/.reduce/hooks/' + name)
     if path.exists(hook_path):
         # run the script with the given args
         click.secho('Found hook for {}, running {}'.format(name, hook_path), fg='blue')
