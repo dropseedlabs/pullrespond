@@ -3,7 +3,7 @@ Pull Respond
 ============
 
 
-... image:: https://travis-ci.org/dropseedlabs/pullrespond.svg?branch=master
+.. image:: https://travis-ci.org/dropseedlabs/pullrespond.svg?branch=master
         :target: https://travis-ci.org/dropseedlabs/pullrespond
 
 .. image:: https://img.shields.io/pypi/v/pullrespond.svg
@@ -20,8 +20,19 @@ Pull Respond
 A simply CLI for responding to and merging pull requests.
 
 
-* Free software: MIT license
-* Documentation: https://pullrespond.readthedocs.io.
+Installation
+------------
+
+.. code-block:: bash
+
+    pip install pullrespond
+    
+Usage
+-----
+
+.. code-block:: bash
+
+    pullrespond <organization slug>
 
 
 Features
