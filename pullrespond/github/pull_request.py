@@ -1,4 +1,5 @@
 import urllib
+import webbrowser
 
 import requests
 import click
@@ -21,7 +22,7 @@ PROMPT_COMMANDS = [
     'comment',
     'overview',
     'diff',
-    # 'open',
+    'open',
     # 'review',
     # 'reviews',
 ]
@@ -55,6 +56,8 @@ class PullRequest(object):
                 click.secho('Comment created.', fg='green')
             elif command_input == 'diff':
                 self.print_diff()
+            elif command_input == 'open':
+                self.open_in_browser()
 
     def comment_prompt(self):
         # could complete usernames with @...
@@ -225,3 +228,15 @@ class PullRequest(object):
         diff = rest(requests.get, endpoint, headers={'Accept': 'application/vnd.github.v3.diff'})
         highlighted = highlight(diff, DiffLexer(), TerminalFormatter())
         click.echo_via_pager(highlighted)
+
+    def open_in_browser(self):
+        query = """query {
+                    repository(owner: "%s", name: "%s") {
+                      pullRequest(number: %s) {
+                        url
+                      }
+                    }
+                }""" % (self.repo.owner.name, self.repo.name, self.number)
+        url = graphql(query)['repository']['pullRequest']['url']
+        click.secho('Opening {} in your browser...'.format(url), fg='yellow')
+        webbrowser.open(url)
