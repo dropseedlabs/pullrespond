@@ -2,7 +2,7 @@
 History
 =======
 
-0.3.0 (unreleased)
+0.3.0 (2017-07-06)
 ------------------
 
 * Add PR close command
