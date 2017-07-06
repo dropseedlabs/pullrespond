@@ -5,7 +5,7 @@ History
 0.1.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+* Add files_changed
 
 
 0.1.2 (2017-07-05)

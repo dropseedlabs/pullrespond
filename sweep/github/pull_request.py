@@ -24,6 +24,7 @@ PROMPT_COMMANDS = [
     'diff',
     'open',
     'review',
+    'files_changed',
     # 'reviews',
 ]
 
@@ -60,6 +61,8 @@ class PullRequest(object):
                 self.open_in_browser()
             elif command_input == 'review':
                 self.review_prompt()
+            elif command_input == 'files_changed':
+                self.print_files_changed()
 
     def comment_prompt(self):
         # could complete usernames with @...
@@ -287,3 +290,24 @@ class PullRequest(object):
         url = graphql(query)['repository']['pullRequest']['url']
         click.secho('Opening {} in your browser...'.format(url), fg='yellow')
         webbrowser.open(url)
+
+    def print_files_changed(self):
+        endpoint = '/repos/{}/pulls/{}/files'.format(self.repo.full_name, self.number)
+        files = rest(requests.get, endpoint)
+        output = []
+
+        def short_status(status):
+            if status == 'added':
+                return click.style('A', fg='green')
+            if status == 'modified':
+                return click.style('M', fg='yellow')
+            if status == 'removed':
+                return click.style('D', fg='red')
+            return click.style(status, fg='blue')
+
+        for f in files:
+            output.append('{status} {filename}'.format(
+                status=short_status(f['status']),
+                filename=f['filename'],
+            ))
+        click.echo_via_pager('\n'.join(output))
