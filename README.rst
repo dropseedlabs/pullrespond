@@ -1,19 +1,19 @@
 ===========
-reduce
+sweep
 ===========
 
 
-.. image:: https://travis-ci.org/dropseedlabs/reduce.svg?branch=master
-        :target: https://travis-ci.org/dropseedlabs/reduce
+.. image:: https://travis-ci.org/dropseedlabs/sweep.svg?branch=master
+        :target: https://travis-ci.org/dropseedlabs/sweep
 
-.. image:: https://img.shields.io/pypi/v/reduce.svg
-        :target: https://pypi.python.org/pypi/reduce
+.. image:: https://img.shields.io/pypi/v/sweep.svg
+        :target: https://pypi.python.org/pypi/sweep
 
-.. image:: https://img.shields.io/pypi/l/reduce.svg
-        :target: https://pypi.python.org/pypi/reduce
+.. image:: https://img.shields.io/pypi/l/sweep.svg
+        :target: https://pypi.python.org/pypi/sweep
 
-.. image:: https://img.shields.io/pypi/pyversions/reduce.svg
-        :target: https://pypi.python.org/pypi/reduce
+.. image:: https://img.shields.io/pypi/pyversions/sweep.svg
+        :target: https://pypi.python.org/pypi/sweep
 
 
 
@@ -25,21 +25,21 @@ Installation
 
 .. code-block:: bash
 
-    pip install reduce
+    pip install sweep
 
 Usage
 -----
 
 .. code-block:: bash
 
-    reduce <organization slug>
+    sweep <organization slug>
 
 Hooks
 -----
 
 There are several places where a user can run a custom script as a part of their
 process (i.e. deploying after a merge). Put an executable script matching the
-name of the hook at ``~/.reduce/hooks/<hook_name>``. Each hook will also
+name of the hook at ``~/.sweep/hooks/<hook_name>``. Each hook will also
 receive a set of arguments, which you can use in your script.
 
 * ``post_merge`` - runs right after a successful merge

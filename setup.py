@@ -29,24 +29,24 @@ test_requirements = [
 ]
 
 setup(
-    name='reduce',
+    name='sweep',
     version='0.1.2.dev0',
     description="A simple CLI for responding to and merging pull requests.",
     long_description=readme + '\n\n' + history,
     author="Dropseed, LLC",
     author_email='python@dropseed.io',
-    url='https://github.com/dropseedlabs/reduce',
-    packages=find_packages(include=['reduce']),
+    url='https://github.com/dropseedlabs/sweep',
+    packages=find_packages(include=['sweep']),
     entry_points={
         'console_scripts': [
-            'reduce=reduce.cli:main'
+            'sweep=sweep.cli:main'
         ]
     },
     include_package_data=True,
     install_requires=requirements,
     license="MIT license",
     zip_safe=False,
-    keywords='reduce',
+    keywords='sweep',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',

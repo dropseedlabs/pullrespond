@@ -1,6 +1,6 @@
 include LICENSE
 include *.rst
-graft reduce
+graft sweep
 graft tests
 global-exclude __pycache__
 global-exclude *.py[co]

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Console script for reduce."""
+"""Console script for sweep."""
 
 import click
 
