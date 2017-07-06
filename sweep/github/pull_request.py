@@ -31,6 +31,7 @@ class PullRequest(ObjectPrompt):
                 'open',
                 'review',
                 'files_changed',
+                'close',
                 # 'reviews',
             ],
             child_key=None,
@@ -116,6 +117,25 @@ class PullRequest(ObjectPrompt):
                       }""" % (pull_id, sha, review, comment)
         graphql(mutation)
         click.secho('Review added - {}.'.format(review), fg='green')
+
+    def close(self):
+        endpoint = '/repos/{}/pulls/{}'.format(self.repo.full_name, self.number)
+        rest(requests.patch, endpoint, data={'state': 'closed'})
+        click.secho('PR closed.', fg='green')
+
+        query = """query {
+                    repository(owner: "%s", name: "%s") {
+                      pullRequest(number: %s) {
+                        headRefName
+                      }
+                    }
+                }""" % (self.repo.owner.name, self.repo.name, self.number)
+        pull_data = graphql(query)['repository']['pullRequest']
+        branch_name = pull_data['headRefName']
+        if click.confirm('Delete the {} branch?'.format(branch_name)):
+            endpoint = '/repos/{}/git/refs/heads/{}'.format(self.repo.full_name, urllib.quote_plus(branch_name))
+            rest(requests.delete, endpoint)
+            click.secho('{} deleted.'.format(branch_name), fg='green')
 
     def merge(self):
         query = """query {
