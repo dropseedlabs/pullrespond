@@ -1,19 +1,24 @@
 import click
-from prompt_toolkit import prompt
-from prompt_toolkit.contrib.completers import WordCompleter
 from terminaltables import AsciiTable
 
 from .api import graphql
 from .pull_request import PullRequest
-from ..prompt_validators import ChoiceValidator
+from ..object_prompt import ObjectPrompt
 from .state import styled_state
 
 
-class Repository(object):
-    def __init__(self, owner, name):
+class Repository(ObjectPrompt):
+    def __init__(self, owner, name, *args, **kwargs):
         self.owner = owner
         self.name = name
         self.full_name = '{}/{}'.format(self.owner.name, self.name)
+        super(Repository, self).__init__(
+            commands=[],
+            child_key='number',
+            pre_prompt_message='Enter a PR number or hit enter to work through them in order.',
+            *args,
+            **kwargs
+        )
 
     def __unicode__(self):
         return self.name
@@ -21,7 +26,8 @@ class Repository(object):
     def __str__(self):
         return self.name
 
-    def get_open_pull_requests(self):
+    def get_children(self):
+        click.secho('Getting open pull requests for {}...'.format(self.full_name), fg='yellow')
         query = """query {
                     repository(owner: "%s", name: "%s") {
                       pullRequests(first: 100, states: OPEN) {
@@ -52,56 +58,29 @@ class Repository(object):
         pulls = [x['node'] for x in query_data['repository']['pullRequests']['edges']]
         return pulls
 
-    def command_prompt(self):
-        pr_number_input = None
-        while pr_number_input != 'done':
-            click.secho('Getting open pull requests for {}...'.format(self.full_name), fg='yellow')
-            pulls = self.get_open_pull_requests()
+    def get_child_object_prompt(self, key):
+        return PullRequest(repo=self, number=key)
 
-            if not pulls:
-                click.secho('There are no repos with open pull requests!', fg='green')
-                return
+    def overview(self, refresh=True):
+        # print the repo name and list of open prs
+        if refresh:
+            self.children = self.get_children()
 
-            # print the repo name and list of open prs
-            click.clear()
-            click.secho(self.full_name, bold=True)
-            click.secho('\nThere are {} open pull requests:\n'.format(len(pulls)))
+        click.clear()
+        click.secho(self.full_name, bold=True)
+        click.secho('\nThere are {} open pull requests:\n'.format(len(self.children)))
 
-            table_data = [
-                ['Number', 'Status', 'Author', 'Title'],
-            ]
-            for pull in pulls:
-                status = pull['commits']['edges'][0]['node']['commit']['status']
-                status = styled_state(status['state']) if status else ''
-                table_data.append([
-                    pull['number'],
-                    status,
-                    pull['author']['login'],
-                    pull['title'],
-                ])
-            table = AsciiTable(table_data)
-            click.echo(table.table)
-
-            click.secho('\nEnter a PR number or hit enter to work through them in order.')
-            pr_numbers = [str(x['number']) for x in pulls] + ['done']
-            pr_number_input = prompt(
-                u'> ',
-                completer=WordCompleter(pr_numbers),
-                validator=ChoiceValidator(pr_numbers, allow_empty=True),
-            )
-
-            if pr_number_input == 'done':
-                pass
-            elif pr_number_input == '':
-                for pr in pulls:
-                    pull = PullRequest(repo=self, number=pr['number'])
-                    pull.print_overview()
-                    pull.command_prompt()
-
-                # exit the while loop by returning when done
-                return
-            else:
-                click.secho('Getting {} #{}...'.format(self, pr_number_input), fg='yellow')
-                pull = PullRequest(repo=self, number=pr_number_input)
-                pull.print_overview()
-                pull.command_prompt()
+        table_data = [
+            ['Number', 'Status', 'Author', 'Title'],
+        ]
+        for pull in self.children:
+            status = pull['commits']['edges'][0]['node']['commit']['status']
+            status = styled_state(status['state']) if status else ''
+            table_data.append([
+                pull['number'],
+                status,
+                pull['author']['login'],
+                pull['title'],
+            ])
+        table = AsciiTable(table_data)
+        click.echo(table.table)

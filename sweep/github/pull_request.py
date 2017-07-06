@@ -13,27 +13,31 @@ from .api import graphql, rest
 from ..prompt_validators import ChoiceValidator
 from ..hooks import run_hook
 from .state import styled_state, color_for_state
+from ..object_prompt import ObjectPrompt
 
 
-PROMPT_COMMANDS = [
-    'merge',
-    'done',
-    # 'commits',
-    # 'comments',
-    'comment',
-    'overview',
-    'diff',
-    'open',
-    'review',
-    'files_changed',
-    # 'reviews',
-]
-
-
-class PullRequest(object):
-    def __init__(self, repo, number):
+class PullRequest(ObjectPrompt):
+    def __init__(self, repo, number, *args, **kwargs):
         self.repo = repo
         self.number = int(number)
+        super(PullRequest, self).__init__(
+            commands=[
+                'merge',
+                # 'commits',
+                # 'comments',
+                'comment',
+                'overview',
+                'diff',
+                'open',
+                'review',
+                'files_changed',
+                # 'reviews',
+            ],
+            child_key=None,
+            pre_prompt_message='PR command',
+            *args,
+            **kwargs
+        )
 
     def __unicode__(self):
         return u'{}#{}'.format(self.repo, self.number)
@@ -41,31 +45,10 @@ class PullRequest(object):
     def __str__(self):
         return '{}#{}'.format(self.repo, self.number)
 
-    def command_prompt(self):
-        command_input = None
-        while command_input not in ('done', ''):
-            command_input = prompt(
-                u'PR command > ',
-                completer=WordCompleter(PROMPT_COMMANDS),
-                validator=ChoiceValidator(PROMPT_COMMANDS, allow_empty=True),
-            )
-            if command_input == 'overview':
-                self.print_overview()
-            elif command_input == 'merge':
-                self.merge_prompt()
-            elif command_input == 'comment':
-                self.comment_prompt()
-                click.secho('Comment created.', fg='green')
-            elif command_input == 'diff':
-                self.print_diff()
-            elif command_input == 'open':
-                self.open_in_browser()
-            elif command_input == 'review':
-                self.review_prompt()
-            elif command_input == 'files_changed':
-                self.print_files_changed()
+    def get_children(self):
+        return []
 
-    def comment_prompt(self):
+    def comment(self):
         # could complete usernames with @...
         click.secho('Enter comment (press ESC then ENTER to finish)')
         comment = prompt(
@@ -87,8 +70,9 @@ class PullRequest(object):
                         }
                       }""" % (pull_request_id, comment)
         graphql(mutation)
+        click.secho('Comment created.', fg='green')
 
-    def review_prompt(self):
+    def review(self):
         # could complete usernames with @...
         review_commands = ('approve', 'comment', 'request_changes')
         review = prompt(
@@ -133,7 +117,7 @@ class PullRequest(object):
         graphql(mutation)
         click.secho('Review added - {}.'.format(review), fg='green')
 
-    def merge_prompt(self):
+    def merge(self):
         query = """query {
                     repository(owner: "%s", name: "%s") {
                       pullRequest(number: %s) {
@@ -175,7 +159,7 @@ class PullRequest(object):
             rest(requests.delete, endpoint)
             click.secho('{} deleted.'.format(branch_name), fg='green')
 
-    def print_overview(self):
+    def overview(self, refresh=True):
         query = """query {
                     repository(owner: "%s", name: "%s") {
                       pullRequest(number: %s) {
@@ -266,13 +250,13 @@ class PullRequest(object):
 
         click.secho('\n--------------------\n')
 
-    def print_diff(self):
+    def diff(self):
         endpoint = '/repos/{}/pulls/{}'.format(self.repo.full_name, self.number)
         diff = rest(requests.get, endpoint, headers={'Accept': 'application/vnd.github.v3.diff'})
         highlighted = highlight(diff, DiffLexer(), TerminalFormatter())
         click.echo_via_pager(highlighted)
 
-    def open_in_browser(self):
+    def open(self):
         query = """query {
                     repository(owner: "%s", name: "%s") {
                       pullRequest(number: %s) {
@@ -284,7 +268,7 @@ class PullRequest(object):
         click.secho('Opening {} in your browser...'.format(url), fg='yellow')
         webbrowser.open(url)
 
-    def print_files_changed(self):
+    def files_changed(self):
         endpoint = '/repos/{}/pulls/{}/files'.format(self.repo.full_name, self.number)
         files = rest(requests.get, endpoint)
         output = []
