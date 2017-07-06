@@ -1,6 +1,7 @@
 import click
 from prompt_toolkit import prompt
 from prompt_toolkit.contrib.completers import WordCompleter
+from terminaltables import AsciiTable
 
 from .api import graphql
 from .pull_request import PullRequest
@@ -27,6 +28,7 @@ class Repository(object):
                           node {
                             number
                             title
+                            author { login }
                           }
                         }
                       }
@@ -52,8 +54,18 @@ class Repository(object):
             click.clear()
             click.secho(self.full_name, bold=True)
             click.secho('\nThere are {} open pull requests:\n'.format(len(pulls)))
+
+            table_data = [
+                ['Number', 'Author', 'Title'],
+            ]
             for pull in pulls:
-                click.secho('#{} - {}'.format(pull['number'], pull['title']))
+                table_data.append([
+                    pull['number'],
+                    pull['author']['login'],
+                    pull['title'],
+                ])
+            table = AsciiTable(table_data)
+            click.echo(table.table)
 
             click.secho('\nEnter a PR number or hit enter to work through them in order.')
             pr_numbers = [str(x['number']) for x in pulls] + ['done']

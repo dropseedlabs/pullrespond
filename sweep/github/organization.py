@@ -1,6 +1,7 @@
 import click
 from prompt_toolkit import prompt
 from prompt_toolkit.contrib.completers import WordCompleter
+from terminaltables import AsciiTable
 
 from .api import graphql
 from .repository import Repository
@@ -51,14 +52,21 @@ class Organization(object):
 
             click.clear()
 
-            click.secho('There are {} {} repos with open pull requests.'.format(len(with_open_pulls), self), fg='green')
+            table_data = [
+                ['Repos ({})'.format(len(with_open_pulls)), 'Pull requests ({})'.format(sum([repo['pullRequests']['totalCount'] for repo in with_open_pulls]))],
+            ]
             for repo in with_open_pulls:
-                click.secho('{:20} {} open'.format(repo['name'], repo['pullRequests']['totalCount']))
+                table_data.append([
+                    repo['name'],
+                    '{} open'.format(repo['pullRequests']['totalCount']),
+                ])
+            table = AsciiTable(table_data)
+            click.echo(table.table)
 
             click.secho('\nEnter a repo name or hit enter to work through them in order.')
             repo_names = [x['name'] for x in with_open_pulls] + ['done']
             repo_input = prompt(
-                u'> ',
+                u'Repo > ',
                 completer=WordCompleter(repo_names),
                 validator=ChoiceValidator(repo_names, allow_empty=True),
             )

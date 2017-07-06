@@ -16,6 +16,7 @@ requirements = [
     'requests',
     'prompt_toolkit',
     'pygments',
+    'terminaltables',
 ]
 
 setup_requirements = [

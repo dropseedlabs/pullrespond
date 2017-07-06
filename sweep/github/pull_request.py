@@ -44,7 +44,7 @@ class PullRequest(object):
         command_input = None
         while command_input not in ('done', ''):
             command_input = prompt(
-                u'> ',
+                u'PR command > ',
                 completer=WordCompleter(PROMPT_COMMANDS),
                 validator=ChoiceValidator(PROMPT_COMMANDS, allow_empty=True),
             )
@@ -271,7 +271,7 @@ class PullRequest(object):
                     description=context['description'],
                 ), fg=color_for_state(context['state']))
 
-        click.secho('')
+        click.secho('\n--------------------\n')
 
     def print_diff(self):
         endpoint = '/repos/{}/pulls/{}'.format(self.repo.full_name, self.number)
