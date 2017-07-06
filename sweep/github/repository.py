@@ -6,6 +6,7 @@ from terminaltables import AsciiTable
 from .api import graphql
 from .pull_request import PullRequest
 from ..prompt_validators import ChoiceValidator
+from .state import styled_state
 
 
 class Repository(object):
@@ -29,6 +30,17 @@ class Repository(object):
                             number
                             title
                             author { login }
+                            commits(last: 1) {
+                              edges {
+                                node {
+                                  commit {
+                                    status {
+                                      state
+                                    }
+                                  }
+                                }
+                              }
+                            }
                           }
                         }
                       }
@@ -56,11 +68,14 @@ class Repository(object):
             click.secho('\nThere are {} open pull requests:\n'.format(len(pulls)))
 
             table_data = [
-                ['Number', 'Author', 'Title'],
+                ['Number', 'Status', 'Author', 'Title'],
             ]
             for pull in pulls:
+                status = pull['commits']['edges'][0]['node']['commit']['status']
+                status = styled_state(status['state']) if status else ''
                 table_data.append([
                     pull['number'],
+                    status,
                     pull['author']['login'],
                     pull['title'],
                 ])

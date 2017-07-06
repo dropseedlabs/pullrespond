@@ -12,6 +12,7 @@ from pygments.formatters import TerminalFormatter
 from .api import graphql, rest
 from ..prompt_validators import ChoiceValidator
 from ..hooks import run_hook
+from .state import styled_state, color_for_state
 
 
 PROMPT_COMMANDS = [
@@ -256,15 +257,7 @@ class PullRequest(object):
         last_commit_status = overview['commits']['edges'][0]['node']['commit']['status']
 
         if last_commit_status:
-            def color_for_state(state):
-                if state == 'PENDING':
-                    return 'yellow'
-                if state == 'SUCCESS':
-                    return 'green'
-                if state == 'FAILURE':
-                    return 'red'
-
-            click.echo('Status: ' + click.style(last_commit_status['state'], fg=color_for_state(last_commit_status['state'])))
+            click.echo('Status: ' + styled_state(last_commit_status['state'], short=False))
             for context in last_commit_status['contexts']:
                 click.secho('- {context}: {description}'.format(
                     context=context['context'],
