@@ -5,7 +5,7 @@ History
 0.1.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+* Rename to "sweep"
 
 
 0.1.1 (2017-07-04)
