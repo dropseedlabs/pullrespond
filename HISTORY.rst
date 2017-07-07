@@ -2,10 +2,11 @@
 History
 =======
 
-0.3.1 (unreleased)
+0.4.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+* Make all commands actual click commands, then invoke them interactively if within sweep
+* Add bulk pull request merging and closing per organization, filtering based on state or title
 
 
 0.3.0 (2017-07-06)
