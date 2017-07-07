@@ -107,7 +107,7 @@ class PullRequest(ObjectPrompt):
     def close(self, delete_branch=False):
         endpoint = '/repos/{}/pulls/{}'.format(self.repo.full_name, self.number)
         rest(requests.patch, endpoint, data={'state': 'closed'})
-        click.secho('PR closed.', fg='green')
+        click.secho('{} closed.'.format(self), fg='green')
 
         query = """query {
                     repository(owner: "%s", name: "%s") {
@@ -155,7 +155,7 @@ class PullRequest(ObjectPrompt):
         }
         rest(requests.put, endpoint, data)
 
-        click.secho('PR successfully merged.', fg='green')
+        click.secho('{} successfully merged.'.format(self), fg='green')
 
         run_hook('post_merge', self.repo.name, self.number, self.repo.full_name)
 
