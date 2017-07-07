@@ -1,3 +1,4 @@
+import webbrowser
 import click
 from terminaltables import AsciiTable
 
@@ -13,7 +14,6 @@ class Repository(ObjectPrompt):
         self.name = name
         self.full_name = '{}/{}'.format(self.owner.name, self.name)
         super(Repository, self).__init__(
-            commands=[],
             child_key='number',
             pre_prompt_message='Enter a PR number or hit enter to work through them in order.',
             *args,
@@ -84,3 +84,13 @@ class Repository(ObjectPrompt):
             ])
         table = AsciiTable(table_data)
         click.echo(table.table)
+
+    def open(self):
+        query = """query {
+                    repository(owner: "%s", name: "%s") {
+                      url
+                    }
+                }""" % (self.owner.name, self.name)
+        url = graphql(query)['repository']['url']
+        click.secho('Opening {} in your browser...'.format(url), fg='yellow')
+        webbrowser.open(url)

@@ -8,6 +8,7 @@ from prompt_toolkit.contrib.completers import WordCompleter
 from pygments import highlight
 from pygments.lexers import DiffLexer
 from pygments.formatters import TerminalFormatter
+from terminaltables import AsciiTable
 
 from .api import graphql, rest
 from ..prompt_validators import ChoiceValidator
@@ -21,19 +22,6 @@ class PullRequest(ObjectPrompt):
         self.repo = repo
         self.number = int(number)
         super(PullRequest, self).__init__(
-            commands=[
-                'merge',
-                # 'commits',
-                # 'comments',
-                'comment',
-                'overview',
-                'diff',
-                'open',
-                'review',
-                'files_changed',
-                'close',
-                # 'reviews',
-            ],
             child_key=None,
             pre_prompt_message='PR command',
             *args,
@@ -71,7 +59,6 @@ class PullRequest(ObjectPrompt):
                         }
                       }""" % (pull_request_id, comment)
         graphql(mutation)
-        click.secho('Comment created.', fg='green')
 
     def review(self):
         # could complete usernames with @...
@@ -116,9 +103,8 @@ class PullRequest(ObjectPrompt):
                         }
                       }""" % (pull_id, sha, review, comment)
         graphql(mutation)
-        click.secho('Review added - {}.'.format(review), fg='green')
 
-    def close(self):
+    def close(self, delete_branch=False):
         endpoint = '/repos/{}/pulls/{}'.format(self.repo.full_name, self.number)
         rest(requests.patch, endpoint, data={'state': 'closed'})
         click.secho('PR closed.', fg='green')
@@ -132,12 +118,12 @@ class PullRequest(ObjectPrompt):
                 }""" % (self.repo.owner.name, self.repo.name, self.number)
         pull_data = graphql(query)['repository']['pullRequest']
         branch_name = pull_data['headRefName']
-        if click.confirm('Delete the {} branch?'.format(branch_name)):
+        if delete_branch or click.confirm('Delete the {} branch?'.format(branch_name)):
             endpoint = '/repos/{}/git/refs/heads/{}'.format(self.repo.full_name, urllib.quote_plus(branch_name))
             rest(requests.delete, endpoint)
             click.secho('{} deleted.'.format(branch_name), fg='green')
 
-    def merge(self):
+    def merge(self, delete=False):
         query = """query {
                     repository(owner: "%s", name: "%s") {
                       pullRequest(number: %s) {
@@ -174,7 +160,7 @@ class PullRequest(ObjectPrompt):
         run_hook('post_merge', self.repo.name, self.number, self.repo.full_name)
 
         branch_name = pull_data['headRefName']
-        if click.confirm('Delete the {} branch?'.format(branch_name)):
+        if delete or click.confirm('Delete the {} branch?'.format(branch_name)):
             endpoint = '/repos/{}/git/refs/heads/{}'.format(self.repo.full_name, urllib.quote_plus(branch_name))
             rest(requests.delete, endpoint)
             click.secho('{} deleted.'.format(branch_name), fg='green')
@@ -308,3 +294,18 @@ class PullRequest(ObjectPrompt):
                 filename=f['filename'],
             ))
         click.echo_via_pager('\n'.join(output))
+
+
+def print_pulls_table(pulls):
+    table_data = [
+        ['Repo', 'Number', 'Author', 'Title']
+    ]
+    for pull in pulls:
+        table_data.append([
+            pull['repository']['name'],
+            pull['number'],
+            '@' + pull['author']['login'],
+            pull['title'],
+        ])
+    table = AsciiTable(table_data)
+    click.echo(table.table)

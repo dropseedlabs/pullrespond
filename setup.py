@@ -40,7 +40,7 @@ setup(
     packages=find_packages(include=['sweep']),
     entry_points={
         'console_scripts': [
-            'sweep=sweep.cli:main'
+            'sweep=sweep.cli:cli'
         ]
     },
     include_package_data=True,

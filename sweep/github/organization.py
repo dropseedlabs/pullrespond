@@ -3,6 +3,7 @@ from terminaltables import AsciiTable
 
 from .api import graphql
 from .repository import Repository
+from .pull_request import PullRequest
 from ..object_prompt import ObjectPrompt
 
 
@@ -10,7 +11,6 @@ class Organization(ObjectPrompt):
     def __init__(self, name, *args, **kwargs):
         self.name = name
         super(Organization, self).__init__(
-            commands=[],
             child_key='name',
             pre_prompt_message='Enter a repo name or hit enter to work through them in order.',
             *args,
@@ -64,3 +64,41 @@ class Organization(ObjectPrompt):
             ])
         table = AsciiTable(table_data)
         click.echo(table.table)
+
+    def filter_pulls(self, state, title):
+        query = """query {
+                  organization(login: "%s") {
+                    repositories(first: 100) {
+                      edges {
+                        node {
+                          pullRequests(states: %s, first: 100) {
+                            totalCount
+                            edges {
+                             node {
+                               title
+                               number
+                               author {
+                                 login
+                               }
+                               repository { name }
+                             }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }""" % (self.name, state.upper())
+
+        # TODO add paging
+        query_data = graphql(query)
+        repos = [x['node'] for x in query_data['organization']['repositories']['edges']]
+        pulls = []
+        for repo in repos:
+            repo_pulls = [x['node'] for x in repo['pullRequests']['edges']]
+            pulls += repo_pulls
+
+        if title:
+            pulls = [x for x in pulls if title in x['title']]
+
+        return pulls
