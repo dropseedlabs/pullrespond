@@ -5,7 +5,9 @@ History
 0.4.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+* Add pagination
+* Add bulk close pull requests
+* Use re.search for pull request title matching
 
 
 0.4.0 (2017-07-06)
