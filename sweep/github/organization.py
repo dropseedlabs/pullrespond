@@ -73,6 +73,9 @@ class Organization(ObjectPrompt):
     def filter_pulls(self, state, title):
         pulls = []
 
+        if not self.children:
+            self.children = self.get_children()
+
         for repo in self.children:
             query = """query {
                         repository(owner: "%s", name: "%s") {
