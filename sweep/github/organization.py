@@ -1,3 +1,5 @@
+import re
+
 import click
 from terminaltables import AsciiTable
 
@@ -99,6 +101,6 @@ class Organization(ObjectPrompt):
             pulls += repo_pulls
 
         if title:
-            pulls = [x for x in pulls if title in x['title']]
+            pulls = [x for x in pulls if re.search(title, x['title'])]
 
         return pulls
