@@ -35,11 +35,11 @@ class ObjectPrompt(object):
             if self.pre_prompt_message:
                 click.echo(self.pre_prompt_message)
 
-            choices = [str(x[self.child_key]) for x in self.children] + self.commands
+            choices = [str(x[self.child_key]) for x in self.children]
             user_input = prompt(
                 u'> ',
-                completer=WordCompleter(choices),
-                validator=ChoiceValidator(choices, allow_empty=True),
+                completer=WordCompleter(choices + self.commands),
+                validator=ChoiceValidator(choices, commands=self.commands, allow_empty=True),
             )
 
             if user_input == '':
@@ -48,10 +48,15 @@ class ObjectPrompt(object):
                     child_prompt.command_prompt()
                 # exit the while loop by returning when done
                 return
-            elif user_input in self.commands:
-                getattr(self, user_input)()
+            elif user_input.split()[0] in self.commands:
+                parts = user_input.split()
+                command = parts[0]
+                # join them back as 1 string
+                args = [' '.join(parts[1:])]
+                getattr(self, command)(*args)
             else:
                 click.secho('Getting {} {}...'.format(self, user_input), fg='yellow')
                 child_prompt = self.get_child_object_prompt(user_input)
                 child_prompt.command_prompt()
-                self.overview(refresh=True)
+
+            self.overview(refresh=True)

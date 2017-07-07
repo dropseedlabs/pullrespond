@@ -137,7 +137,7 @@ class PullRequest(ObjectPrompt):
             rest(requests.delete, endpoint)
             click.secho('{} deleted.'.format(branch_name), fg='green')
 
-    def merge(self):
+    def merge(self, delete=False):
         query = """query {
                     repository(owner: "%s", name: "%s") {
                       pullRequest(number: %s) {
@@ -174,7 +174,7 @@ class PullRequest(ObjectPrompt):
         run_hook('post_merge', self.repo.name, self.number, self.repo.full_name)
 
         branch_name = pull_data['headRefName']
-        if click.confirm('Delete the {} branch?'.format(branch_name)):
+        if delete or click.confirm('Delete the {} branch?'.format(branch_name)):
             endpoint = '/repos/{}/git/refs/heads/{}'.format(self.repo.full_name, urllib.quote_plus(branch_name))
             rest(requests.delete, endpoint)
             click.secho('{} deleted.'.format(branch_name), fg='green')
