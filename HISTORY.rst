@@ -2,7 +2,7 @@
 History
 =======
 
-0.4.0 (unreleased)
+0.4.0 (2017-07-06)
 ------------------
 
 * Make all commands actual click commands, then invoke them interactively if within sweep
