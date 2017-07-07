@@ -1,3 +1,5 @@
+import re
+from copy import deepcopy
 import os
 import click
 import requests
@@ -28,7 +30,10 @@ def get_headers():
     return headers
 
 
-def graphql(query):
+def graphql(query, to_return_path=None, page_info_path=None, after=None):
+    if after:
+        query = re.sub('after: .*\)', 'after: "{}")'.format(after), query)
+
     response = requests.post(
         'https://api.github.com/graphql',
         headers=get_headers(),
@@ -39,10 +44,32 @@ def graphql(query):
 
     data = response.json()['data']
 
+    # import pdb; pdb.set_trace()
+
     if data == None:
         raise Exception('No data in response.\n{}'.format(response.text))
 
-    return data
+    data_to_return = deepcopy(data)
+
+    if to_return_path:
+        for p in to_return_path.split('.'):
+            data_to_return = data_to_return[p]
+
+    if page_info_path:
+        # we'll are going to assume there's only 1 paginated object
+        # and it's in the top 2 levels
+        page_info = deepcopy(data)
+        for p in page_info_path.split('.'):
+            page_info = page_info[p]
+
+        if 'endCursor' not in page_info:
+            raise Exception('pageInfo not found, but we didn\'t try very hard.')
+
+        if page_info['hasNextPage']:
+            next_data = graphql(query, to_return_path=to_return_path, page_info_path=page_info_path, after=page_info['endCursor'])
+            data_to_return = data_to_return + next_data
+
+    return data_to_return
 
 
 def rest(requests_func, endpoint, data=None, headers={}):

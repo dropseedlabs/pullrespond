@@ -27,7 +27,11 @@ class Organization(ObjectPrompt):
         click.secho('Getting open pull requests for {}...'.format(self), fg='yellow')
         query = """query {
                   organization(login: "%s") {
-                    repositories(first: 100) {
+                    repositories(first: 100, after: null) {
+                      pageInfo {
+                        endCursor
+                        hasNextPage
+                      }
                       edges {
                         node {
                           name
@@ -40,9 +44,8 @@ class Organization(ObjectPrompt):
                   }
                 }""" % self.name
 
-        # TODO add paging
-        query_data = graphql(query)
-        repos = [x['node'] for x in query_data['organization']['repositories']['edges']]
+        repo_nodes = graphql(query, to_return_path='organization.repositories.edges', page_info_path='organization.repositories.pageInfo')
+        repos = [x['node'] for x in repo_nodes]
         return [x for x in repos if x['pullRequests']['totalCount']]
 
     def get_child_object_prompt(self, key):
@@ -66,13 +69,17 @@ class Organization(ObjectPrompt):
         click.echo(table.table)
 
     def filter_pulls(self, state, title):
-        query = """query {
-                  organization(login: "%s") {
-                    repositories(first: 100) {
-                      edges {
-                        node {
-                          pullRequests(states: %s, first: 100) {
+        pulls = []
+
+        for repo in self.children:
+            query = """query {
+                        repository(owner: "%s", name: "%s") {
+                          pullRequests(states: %s, first: 100, after: null) {
                             totalCount
+                            pageInfo {
+                              endCursor
+                              hasNextPage
+                            }
                             edges {
                              node {
                                title
@@ -85,17 +92,10 @@ class Organization(ObjectPrompt):
                             }
                           }
                         }
-                      }
-                    }
-                  }
-                }""" % (self.name, state.upper())
+                    }""" % (self.name, repo['name'], state.upper())
 
-        # TODO add paging
-        query_data = graphql(query)
-        repos = [x['node'] for x in query_data['organization']['repositories']['edges']]
-        pulls = []
-        for repo in repos:
-            repo_pulls = [x['node'] for x in repo['pullRequests']['edges']]
+            pull_nodes = graphql(query, to_return_path='repository.pullRequests.edges', page_info_path='repository.pullRequests.pageInfo')
+            repo_pulls = [x['node'] for x in pull_nodes]
             pulls += repo_pulls
 
         if title:

@@ -68,6 +68,26 @@ def merge_pulls(ctx):
                     click.confirm('Continue with the rest?', abort=True)
 
 
+@pulls.command('close')
+@click.pass_context
+def close_pulls(ctx):
+
+    organization = ctx.obj['organization']
+    pulls = ctx.obj['pulls']
+    print_pulls_table(pulls)
+
+    if click.confirm(click.style('Are you sure you want to close these pull requests?', fg='red')):
+        if click.confirm(click.style('Are you positive!?', fg='red')):
+            for pull in pulls:
+                ctx.obj['repository'] = Repository(owner=organization, name=pull['repository']['name'])
+                ctx.obj['pull'] = PullRequest(repo=ctx.obj['repository'], number=pull['number'])
+                try:
+                    ctx.invoke(close)
+                except Exception:
+                    click.secho('Failed to close {}'.format(pull), fg='red')
+                    click.confirm('Continue with the rest?', abort=True)
+
+
 @organization.group(invoke_without_command=True)
 @click.argument('name')
 @click.pass_context

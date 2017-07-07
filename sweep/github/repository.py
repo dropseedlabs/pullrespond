@@ -30,7 +30,11 @@ class Repository(ObjectPrompt):
         click.secho('Getting open pull requests for {}...'.format(self.full_name), fg='yellow')
         query = """query {
                     repository(owner: "%s", name: "%s") {
-                      pullRequests(first: 100, states: OPEN) {
+                      pullRequests(first: 100, states: OPEN, after: null) {
+                        pageInfo {
+                          endCursor
+                          hasNextPage
+                        }
                         edges {
                           node {
                             number
@@ -53,9 +57,8 @@ class Repository(ObjectPrompt):
                     }
                 }""" % (self.owner.name, self.name)
 
-        # TODO add paging
-        query_data = graphql(query)
-        pulls = [x['node'] for x in query_data['repository']['pullRequests']['edges']]
+        pull_nodes = graphql(query, to_return_path='repository.pullRequests.edges', page_info_path='repository.pullRequests.pageInfo')
+        pulls = [x['node'] for x in pull_nodes]
         return pulls
 
     def get_child_object_prompt(self, key):
