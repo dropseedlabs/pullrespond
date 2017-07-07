@@ -13,6 +13,8 @@ class ChoiceValidator(Validator):
 
         if text.strip() == '' and self.allow_empty:
             return
+        elif text.strip() == '' and not self.allow_empty:
+            raise ValidationError(message=u'Empty input not allowed.', cursor_position=len(text))
 
         valid = False
 
