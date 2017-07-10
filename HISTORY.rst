@@ -2,7 +2,7 @@
 History
 =======
 
-0.4.2 (unreleased)
+0.4.2 (2017-07-10)
 ------------------
 
 * Fix ``sweep <org> pull`` no data
