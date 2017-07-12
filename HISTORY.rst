@@ -2,7 +2,7 @@
 History
 =======
 
-0.4.3 (unreleased)
+0.4.3 (2017-07-12)
 ------------------
 
 * Improved interactive prompt, including options and multi-commands
