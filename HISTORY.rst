@@ -5,7 +5,7 @@ History
 0.4.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+* Fix missing prompt validator
 
 
 0.4.3 (2017-07-12)
