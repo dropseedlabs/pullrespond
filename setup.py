@@ -31,7 +31,7 @@ test_requirements = [
 
 setup(
     name='sweep',
-    version='0.4.4',
+    version='0.4.5.dev0',
     description="A simple CLI for responding to and merging pull requests.",
     long_description=readme + '\n\n' + history,
     author="Dropseed, LLC",
