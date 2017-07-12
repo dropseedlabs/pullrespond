@@ -5,7 +5,9 @@ History
 0.4.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+* Improved interactive prompt, including options and multi-commands
+* Removed "enter-key speed mode"
+* Exception for GraphQL errors
 
 
 0.4.2 (2017-07-10)
