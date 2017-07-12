@@ -40,20 +40,19 @@ class ObjectPrompt(object):
             if self.pre_prompt_message:
                 click.echo(self.pre_prompt_message)
 
-            commands = set(ctx.command.commands.keys())
-            commands.add('help')
-            commands.add('done')
-
-            commands = list(commands)
-
+            commands = [
+                ('done', 'Close this prompt'),
+            ]
             choices = [str(x[self.child_key]) for x in self.children]
+
             user_input = prompt(
                 u'> ',
                 completer=ClickCompleter(
                     ctx,
-                    choices,
+                    additional_commands=commands,
                     default_subcommand=default_subcommand,
-                    choice_display_meta='(repository)'
+                    default_subcommand_choices=choices,
+                    choice_display_meta='(enter prompt)'
                 ),
                 history=prompt_memory_history,
             )
@@ -62,18 +61,17 @@ class ObjectPrompt(object):
                 click.secho('Enter a command.', fg='red')
             elif user_input == 'done':
                 break
-            elif shlex.split(user_input)[0] == 'help':
-                # print the help ourselves
-                click.echo('Available commands:')
-                for command in commands:
-                    click.echo('  ' + command)
-
-            elif shlex.split(user_input)[0] in commands:
-                self.interpret_subcommand(ctx, user_input)
-            elif default_subcommand:
+            elif default_subcommand and shlex.split(user_input)[0] in choices:
                 # assume they started with repo name or pr number, accept as ok
                 # behavior given where they're at
                 self.interpret_subcommand(ctx, default_subcommand + ' ' + user_input)
+
+                # if entered a new prompt (no args, just choice),
+                # when we come back out, reload the overview
+                if len(shlex.split(user_input)) == 1:
+                    self.overview(refresh=True)
+            else:
+                self.interpret_subcommand(ctx, user_input)
 
             # self.overview(refresh=True)
 
@@ -81,7 +79,12 @@ class ObjectPrompt(object):
         parts = shlex.split(user_input)
         command_name = parts[0]
         arg_parts = parts[1:]
-        subcommand = ctx.command.commands[command_name]
+        subcommand = ctx.command.commands.get(command_name, None)
+
+        if subcommand is None:
+            click.secho('"{}" command not found.'.format(command_name), fg='red')
+            return
+
         try:
             subcommand.main(args=arg_parts, parent=ctx, standalone_mode=False)
         except TypeError as e:

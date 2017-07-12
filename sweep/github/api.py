@@ -5,6 +5,10 @@ import click
 import requests
 
 
+class GraphqlErrorsException(Exception):
+    pass
+
+
 def get_github_token():
     token_file_path = os.path.expanduser('~/.sweep/github_token')
     if not os.path.exists(token_file_path):
@@ -42,10 +46,11 @@ def graphql(query, to_return_path=None, page_info_path=None, after=None):
 
     response.raise_for_status()
 
+    errors = response.json().get('errors', None)
+    if errors:
+        raise GraphqlErrorsException(errors)
+
     data = response.json()['data']
-
-    # import pdb; pdb.set_trace()
-
     if data == None:
         raise Exception('No data in response.\n{}'.format(response.text))
 

@@ -3,7 +3,7 @@ import re
 import click
 from terminaltables import AsciiTable
 
-from .api import graphql
+from .api import graphql, GraphqlErrorsException
 from .repository import Repository
 from .pull_request import PullRequest
 from ..object_prompt import ObjectPrompt
