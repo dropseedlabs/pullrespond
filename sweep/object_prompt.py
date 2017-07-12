@@ -3,7 +3,6 @@ import click
 from prompt_toolkit import prompt
 from prompt_toolkit.history import InMemoryHistory
 
-from .prompt_validators import ChoiceValidator
 from .prompt_completers import ClickCompleter
 
 
