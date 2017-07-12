@@ -15,7 +15,7 @@ class Repository(ObjectPrompt):
         self.full_name = '{}/{}'.format(self.owner.name, self.name)
         super(Repository, self).__init__(
             child_key='number',
-            pre_prompt_message='Enter a PR number or hit enter to work through them in order.',
+            pre_prompt_message='Enter a PR number or command (TAB for options).',
             *args,
             **kwargs
         )

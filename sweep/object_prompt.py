@@ -1,10 +1,10 @@
-from copy import deepcopy
 import shlex
 import click
 from prompt_toolkit import prompt
-from prompt_toolkit.contrib.completers import WordCompleter
+from prompt_toolkit.history import InMemoryHistory
 
 from .prompt_validators import ChoiceValidator
+from .prompt_completers import ClickCompleter
 
 
 class ObjectPrompt(object):
@@ -31,6 +31,8 @@ class ObjectPrompt(object):
 
         self.overview(refresh=False)
 
+        prompt_memory_history = InMemoryHistory()
+
         user_input = None
         while user_input != 'done':
 
@@ -47,15 +49,17 @@ class ObjectPrompt(object):
             choices = [str(x[self.child_key]) for x in self.children]
             user_input = prompt(
                 u'> ',
-                completer=WordCompleter(choices + commands),
-                validator=ChoiceValidator(choices, commands=commands, allow_empty=True),
+                completer=ClickCompleter(
+                    ctx,
+                    choices,
+                    default_subcommand=default_subcommand,
+                    choice_display_meta='(repository)'
+                ),
+                history=prompt_memory_history,
             )
 
             if user_input == '':
-                if default_subcommand:
-                    for child in self.children:
-                        self.interpret_subcommand(ctx, default_subcommand + ' ' + str(child[self.child_key]))
-                break
+                click.secho('Enter a command.', fg='red')
             elif user_input == 'done':
                 break
             elif shlex.split(user_input)[0] == 'help':

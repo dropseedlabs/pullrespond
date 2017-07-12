@@ -14,7 +14,7 @@ class Organization(ObjectPrompt):
         self.name = name
         super(Organization, self).__init__(
             child_key='name',
-            pre_prompt_message='Enter a repo name or hit enter to work through them in order.',
+            pre_prompt_message='Enter a repo name or command (TAB for options).',
             *args,
             **kwargs
         )
