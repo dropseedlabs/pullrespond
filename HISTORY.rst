@@ -2,7 +2,7 @@
 History
 =======
 
-0.4.4 (unreleased)
+0.4.4 (2017-07-12)
 ------------------
 
 * Fix missing prompt validator
