@@ -5,7 +5,7 @@ History
 0.4.5 (unreleased)
 ------------------
 
-- Nothing changed yet.
+* Added commands to create a label on a repo or all repos in an organization
 
 
 0.4.4 (2017-07-12)

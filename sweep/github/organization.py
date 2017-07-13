@@ -26,7 +26,7 @@ class Organization(ObjectPrompt):
         return self.name
 
     def get_children(self):
-        click.secho('Getting open pull requests for {}...'.format(self), fg='yellow')
+        click.secho('Getting {} repos...'.format(self), fg='yellow')
         query = """query {
                   organization(login: "%s") {
                     repositories(first: 100, after: null) {
@@ -48,7 +48,13 @@ class Organization(ObjectPrompt):
 
         repo_nodes = graphql(query, to_return_path='organization.repositories.edges', page_info_path='organization.repositories.pageInfo')
         repos = [x['node'] for x in repo_nodes]
-        return [x for x in repos if x['pullRequests']['totalCount']]
+        return repos
+
+    def repos_with_pulls(self):
+        if not self.children:
+            self.children = self.get_children()
+
+        return [x for x in self.children if x['pullRequests']['totalCount']]
 
     def get_child_object_prompt(self, key):
         return Repository(owner=self, name=key)
@@ -59,10 +65,12 @@ class Organization(ObjectPrompt):
 
         click.clear()
 
+        repos = self.repos_with_pulls()
+
         table_data = [
-            ['Repos ({})'.format(len(self.children)), 'Pull requests ({})'.format(sum([repo['pullRequests']['totalCount'] for repo in self.children]))],
+            ['Repos ({})'.format(len(repos)), 'Pull requests ({})'.format(sum([repo['pullRequests']['totalCount'] for repo in repos]))],
         ]
-        for repo in self.children:
+        for repo in repos:
             table_data.append([
                 repo['name'],
                 '{} open'.format(repo['pullRequests']['totalCount']),
@@ -73,10 +81,7 @@ class Organization(ObjectPrompt):
     def filter_pulls(self, state, title):
         pulls = []
 
-        if not self.children:
-            self.children = self.get_children()
-
-        for repo in self.children:
+        for repo in self.repos_with_pulls():
             query = """query {
                         repository(owner: "%s", name: "%s") {
                           pullRequests(states: %s, first: 100, after: null) {

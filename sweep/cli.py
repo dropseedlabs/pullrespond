@@ -89,6 +89,23 @@ def close_pulls(ctx):
                     click.confirm('Continue with the rest?', abort=True)
 
 
+@organization.group('labels')
+@click.pass_context
+def organization_labels(ctx):
+    pass
+
+
+@organization_labels.command('create')
+@click.argument('name')
+@click.argument('color')
+@click.pass_context
+def create_label_on_organization_repos(ctx, *args, **kwargs):
+    organization = ctx.obj['organization']
+    for repo in organization.get_children():
+        ctx.obj['repository'] = Repository(owner=organization, name=repo['name'])
+        ctx.invoke(create_repo_label, *args, **kwargs)
+
+
 @organization.group(invoke_without_command=True)
 @click.argument('name')
 @click.pass_context
@@ -129,6 +146,21 @@ def pull(ctx, number):
 
     if ctx.invoked_subcommand is None:
         pull.command_prompt(ctx)
+
+
+@repo.group('labels')
+@click.pass_context
+def repo_labels(ctx):
+    pass
+
+
+@repo_labels.command('create')
+@click.argument('name')
+@click.argument('color')
+@click.pass_context
+def create_repo_label(ctx, name, color):
+    repo = ctx.obj['repository']
+    repo.create_label(name, color)
 
 
 @pull.command('overview')

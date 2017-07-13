@@ -1,8 +1,9 @@
 import webbrowser
 import click
 from terminaltables import AsciiTable
+import requests
 
-from .api import graphql
+from .api import graphql, rest
 from .pull_request import PullRequest
 from ..object_prompt import ObjectPrompt
 from .state import styled_state
@@ -97,3 +98,16 @@ class Repository(ObjectPrompt):
         url = graphql(query)['repository']['url']
         click.secho('Opening {} in your browser...'.format(url), fg='yellow')
         webbrowser.open(url)
+
+    def create_label(self, name, color):
+        data = {'name': name, 'color': color}
+        click.secho('Adding "{}" label to {}'.format(name, self.full_name))
+        try:
+            rest(requests.post, '/repos/{}/{}/labels'.format(self.owner.name, self.name), data=data)
+        except requests.exceptions.HTTPError as e:
+            response = e.response
+            if response.json().get('errors', []):
+                for error in response.json()['errors']:
+                    click.secho('Field "{}" {}'.format(error['field'], error['code']), fg='red')
+            else:
+                raise e
