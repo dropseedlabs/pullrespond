@@ -1,0 +1,7 @@
+collectors:
+
+- type: python-pip
+  path: requirements_dev.txt
+  actors:
+  - type: python-pip
+    versions: "Y.Y.Y"
