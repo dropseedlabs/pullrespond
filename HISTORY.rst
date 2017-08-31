@@ -2,7 +2,7 @@
 History
 =======
 
-0.4.5 (unreleased)
+0.5.0 (unreleased)
 ------------------
 
 * Added commands to create a label on a repo or all repos in an organization
