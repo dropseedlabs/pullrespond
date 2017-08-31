@@ -2,7 +2,7 @@
 History
 =======
 
-0.5.1 (unreleased)
+0.5.1 (2017-08-31)
 ------------------
 
 * Add option to filter pulls by status (from status checks on latest commit)
