@@ -298,14 +298,16 @@ class PullRequest(ObjectPrompt):
 
 def print_pulls_table(pulls):
     table_data = [
-        ['Repo', 'Number', 'Author', 'Title']
+        ['Repo', 'Number', 'Status', 'Author', 'Title', 'Commits']
     ]
     for pull in pulls:
         table_data.append([
             pull['repository']['name'],
             pull['number'],
+            styled_state(pull['commits']['edges'][0]['node']['commit']['status']['state'], colored=True, short=True),
             '@' + pull['author']['login'],
             pull['title'],
+            pull['commits']['totalCount'],
         ])
     table = AsciiTable(table_data)
     click.echo(table.table)

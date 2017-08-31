@@ -6,6 +6,7 @@ History
 ------------------
 
 * Added commands to create a label on a repo or all repos in an organization
+* Add PR status and number of commits to PR tables
 
 
 0.4.4 (2017-07-12)

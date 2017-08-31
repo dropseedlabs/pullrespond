@@ -97,6 +97,19 @@ class Organization(ObjectPrompt):
                                author {
                                  login
                                }
+                               commits(last: 1) {
+                                 totalCount
+                                 edges {
+                                     node {
+                                       commit {
+                                         status {
+                                           id
+                                           state
+                                         }
+                                       }
+                                     }
+                                  }
+                                }
                                repository { name }
                              }
                             }
