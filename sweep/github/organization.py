@@ -78,7 +78,7 @@ class Organization(ObjectPrompt):
         table = AsciiTable(table_data)
         click.echo(table.table)
 
-    def filter_pulls(self, state, title):
+    def filter_pulls(self, state, title, status):
         pulls = []
 
         for repo in self.repos_with_pulls():
@@ -123,5 +123,8 @@ class Organization(ObjectPrompt):
 
         if title:
             pulls = [x for x in pulls if re.search(title, x['title'])]
+
+        if status is not None:
+            pulls = [x for x in pulls if x['commits']['edges'][0]['node']['commit']['status']['state'] == status]
 
         return pulls

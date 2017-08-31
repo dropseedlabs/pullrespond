@@ -35,12 +35,18 @@ def organization_overview(ctx):
 @organization.group(invoke_without_command=True)
 @click.option('--state', default='open', help='Filter by PR state')
 @click.option('--title', default=None, help='Filter by PR title')
+@click.option(
+    '--status',
+    default=None,
+    help='Filter by PR latest commit status',
+    type=click.Choice(['PENDING', 'SUCCESS', 'FAILURE'])
+)
 @click.pass_context
-def pulls(ctx, state, title):
+def pulls(ctx, state, title, status):
     """View or modify pull requests"""
 
     organization = ctx.obj['organization']
-    pulls = organization.filter_pulls(state=state, title=title)
+    pulls = organization.filter_pulls(state=state, title=title, status=status)
     ctx.obj['pulls'] = pulls
 
     if ctx.invoked_subcommand is None:
