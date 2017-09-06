@@ -5,7 +5,7 @@ History
 0.5.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+* Fix pull requests with no status
 
 
 0.5.1 (2017-08-31)

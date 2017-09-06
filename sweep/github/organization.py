@@ -5,7 +5,7 @@ from terminaltables import AsciiTable
 
 from .api import graphql, GraphqlErrorsException
 from .repository import Repository
-from .pull_request import PullRequest
+from .pull_request import PullRequest, get_pull_request_state
 from ..object_prompt import ObjectPrompt
 
 
@@ -125,6 +125,6 @@ class Organization(ObjectPrompt):
             pulls = [x for x in pulls if re.search(title, x['title'])]
 
         if status is not None:
-            pulls = [x for x in pulls if x['commits']['edges'][0]['node']['commit']['status']['state'] == status]
+            pulls = [x for x in pulls if get_pull_request_state(x) == status]
 
         return pulls

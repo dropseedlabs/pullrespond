@@ -304,10 +304,20 @@ def print_pulls_table(pulls):
         table_data.append([
             pull['repository']['name'],
             pull['number'],
-            styled_state(pull['commits']['edges'][0]['node']['commit']['status']['state'], colored=True, short=True),
+            styled_state(get_pull_request_state(pull), colored=True, short=True),
             '@' + pull['author']['login'],
             pull['title'],
             pull['commits']['totalCount'],
         ])
     table = AsciiTable(table_data)
     click.echo(table.table)
+
+
+def get_pull_request_state(pull_request):
+    commit = pull_request['commits']['edges'][0]['node']['commit']
+    status = commit.get('status', None)
+
+    if status:
+        return status['state']
+
+    return None

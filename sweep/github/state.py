@@ -2,6 +2,9 @@ import click
 
 
 def styled_state(state, colored=True, short=True):
+    if not state:
+        return ''
+
     color = None
     string = state
 
