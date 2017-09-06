@@ -2,7 +2,7 @@
 History
 =======
 
-0.5.2 (unreleased)
+0.5.2 (2017-09-06)
 ------------------
 
 * Fix pull requests with no status
