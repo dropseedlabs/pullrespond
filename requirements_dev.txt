@@ -5,7 +5,7 @@ flake8==3.4.1
 tox==2.8.1
 coverage==4.4.1
 
-pytest==3.2.1
+pytest==3.2.2
 pytest-runner==2.12.1
 
 zest.releaser==6.12.5
