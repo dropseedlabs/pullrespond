@@ -112,6 +112,26 @@ def create_label_on_organization_repos(ctx, *args, **kwargs):
         ctx.invoke(create_repo_label, *args, **kwargs)
 
 
+@organization.group('files')
+@click.pass_context
+def organization_files(ctx):
+    pass
+
+
+@organization_files.command('update')
+@click.argument('path_in_repo', type=str)
+@click.argument('matching_file_path', type=click.Path(exists=True))
+@click.argument('to_file_path', type=click.Path(exists=True))
+@click.option('--commit-message')
+@click.pass_context
+def update_repo_file(ctx, *args, **kwargs):
+    """Update a file in a repo that matches an existing file"""
+    organization = ctx.obj['organization']
+    for repo in organization.get_children():
+        ctx.obj['repository'] = Repository(owner=organization, name=repo['name'])
+        ctx.invoke(update_repo_file, *args, **kwargs)
+
+
 @organization.group(invoke_without_command=True)
 @click.argument('name')
 @click.pass_context
@@ -167,6 +187,24 @@ def repo_labels(ctx):
 def create_repo_label(ctx, name, color):
     repo = ctx.obj['repository']
     repo.create_label(name, color)
+
+
+@repo.group('files')
+@click.pass_context
+def repo_files(ctx):
+    pass
+
+
+@repo_files.command('update')
+@click.argument('path_in_repo', type=str)
+@click.argument('matching_file_path', type=click.Path(exists=True))
+@click.argument('to_file_path', type=click.Path(exists=True))
+@click.option('--commit-message')
+@click.pass_context
+def update_repo_file(ctx, path_in_repo, matching_file_path, to_file_path, commit_message):
+    """Update a file in a repo that matches an existing file"""
+    repo = ctx.obj['repository']
+    repo.update_file(path_in_repo, matching_file_path, to_file_path, commit_message)
 
 
 @pull.command('overview')

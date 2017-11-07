@@ -3,7 +3,9 @@ import click
 from terminaltables import AsciiTable
 import requests
 
-from .api import graphql, rest
+from github import Github
+
+from .api import graphql, rest, get_github_token
 from .pull_request import PullRequest
 from ..object_prompt import ObjectPrompt
 from .state import styled_state
@@ -26,6 +28,10 @@ class Repository(ObjectPrompt):
 
     def __str__(self):
         return self.name
+
+    def get_pygithub_repo(self):
+        g = Github(get_github_token())
+        return g.get_repo(self.full_name)
 
     def get_children(self):
         click.secho('Getting open pull requests for {}...'.format(self.full_name), fg='yellow')
@@ -115,3 +121,33 @@ class Repository(ObjectPrompt):
                     click.secho('Field "{}" {}'.format(error['field'], error['code']), fg='red')
             else:
                 raise e
+
+    def update_file(self, path_in_repo, matching_file_path, to_file_path, commit_message=None):
+
+        if commit_message is None:
+            commit_message = 'Update {}'.format(path_in_repo)
+
+        pygithub_repo = self.get_pygithub_repo()
+        try:
+            existing_github_file = pygithub_repo.get_file_contents(path_in_repo)
+            existing_contents = existing_github_file.decoded_content
+        except Exception as e:
+            click.secho('Error getting {} in {}: {}'.format(path_in_repo, self, e), fg='red')
+            return
+
+        click.secho('Contents of {} in {}'.format(path_in_repo, self), fg='green')
+        click.secho(existing_contents)
+
+        with open(matching_file_path, 'r') as f:
+            matching_contents = f.read()
+
+        if existing_contents.strip().encode('utf-8') != matching_contents.strip().encode('utf-8'):
+            click.secho('Contents to not match the expected:\n' + matching_contents, fg='red')
+            return
+
+        with open(to_file_path, 'r') as f:
+            new_contents = f.read()
+
+        click.secho('Updating {} in {}'.format(path_in_repo, self), fg='green')
+        pygithub_repo.update_file(path_in_repo, commit_message, new_contents, existing_github_file.sha)
+        click.secho('Successfully updated {} in {}'.format(path_in_repo, self), fg='green')
