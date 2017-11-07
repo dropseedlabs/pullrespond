@@ -17,6 +17,7 @@ requirements = [
     'prompt_toolkit',
     'pygments',
     'terminaltables',
+    'pygithub',
 ]
 
 setup_requirements = [
