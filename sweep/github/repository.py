@@ -100,8 +100,12 @@ class Repository(ObjectPrompt):
         webbrowser.open(url)
 
     def create_label(self, name, color):
+        if color.startswith('#'):
+            color  = color[1:]
+
         data = {'name': name, 'color': color}
         click.secho('Adding "{}" label to {}'.format(name, self.full_name))
+
         try:
             rest(requests.post, '/repos/{}/{}/labels'.format(self.owner.name, self.name), data=data)
         except requests.exceptions.HTTPError as e:
