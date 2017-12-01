@@ -8,4 +8,4 @@ coverage==4.4.1
 pytest==3.2.3
 pytest-runner==3.0
 
-zest.releaser==6.12.5
+zest.releaser==6.13.2
