@@ -149,5 +149,6 @@ class Repository(ObjectPrompt):
             new_contents = f.read()
 
         click.secho('Updating {} in {}'.format(path_in_repo, self), fg='green')
-        pygithub_repo.update_file(path_in_repo, commit_message, new_contents, existing_github_file.sha)
+        path_to_update = '/' + path_in_repo if not path_in_repo.startswith('/') else path_in_repo
+        pygithub_repo.update_file(path_to_update, commit_message, new_contents, existing_github_file.sha)
         click.secho('Successfully updated {} in {}'.format(path_in_repo, self), fg='green')
