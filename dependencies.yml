@@ -1,4 +1,4 @@
 version: 2
 collectors:
-- type: python-pip
+- type: python
   path: requirements_dev.txt
