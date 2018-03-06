@@ -1,4 +1,4 @@
 version: 2
-collectors:
+dependencies:
 - type: python
   path: requirements_dev.txt
