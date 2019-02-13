@@ -1,3 +1,8 @@
+**This project is no longer maintained or available via pip. While somewhat interesting, we decided most
+of the functionality we wanted this for gets too specific and are better off being single-purpose
+scripts or command-line tools. An example is here: https://github.com/dropseed/github-org-update-file**
+
+
 ===========
 sweep
 ===========
